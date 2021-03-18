@@ -1,0 +1,36 @@
+## yichahucha
+## github地址   https://github.com/yichahucha/surge.git
+
+## 作者名         yichahucha
+## 作者库名       surge
+## 作者分支名     master
+## 同步分支名     yichahucha
+
+name: yichahucha-sync
+on:
+  schedule:
+    - cron: '1 */3 * * *'
+  workflow_dispatch:
+  watch:
+    types: started
+  repository_dispatch:
+    types: sync-yichahucha-surge
+jobs:
+  repo-sync:
+    env:
+      PAT: ${{ secrets.PAT }} 
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: sync yichahucha-surge
+        uses: repo-sync/github-sync@v2
+        if: env.PAT
+        with:
+          source_repo: "https://github.com/yichahucha/surge.git"
+          source_branch: "master"
+          destination_branch: "yichahucha"
+          github_token: ${{ secrets.PAT }}
